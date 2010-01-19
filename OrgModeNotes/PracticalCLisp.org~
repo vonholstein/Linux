@@ -1,0 +1,56 @@
+* Chapter 1
+** Self Evaluating Object - Eg 10
+*** Is an object that evaluates to itself
+* Chapter 3
+ + list, property list alias plist
+ + Property list is created with format (value :symbolname value :symbolname repeat)
+ + keyword symbol - any name that starts with a colon
+ + function getf returns value associated with symbol in a plist
+  - Usage: (getf plist indicator)
+ + Lisp naming convention for defining global variables - *variable-name*
+ + use push macro to add items to a list
+ + Loop macro
+  - loop until exit
+ + with-open-file used to open a file
+  - Basic Usage (with-open-file (stream filespec))
+  - with-open-file macro opens a file, binds the stream to a variable, executes a set of expressions, and then closes the file
+  - Makes sure that the file is closed even if something goes wrong while evaluating the body
+  - Output: (with-open-file (out filename :direction :output))
+  - Input: (with-open-file (in filename))
+   * reading a file for input does not require direction arg as input is default)
+  - SETF macro is CLisp's main assignment operator
+   * sets its first argument to the result of evaluating its seconds argument
+ + with-standard-io-syntax ensures that certain variables that affect the behavior of PRINT are set to their standard values
+ + PRINT prints Lisp objects in form that can be read back in by the Lisp reader
+ + REMOVE-IF-NOT takes a predicate and a list and returns a list containing only the elements of the original list that match the predicate
+  - Usage: (remove-if-not predicate-function list)
+ + keyword parameters - one way to achieve varying number of arguments
+  - prefix argument list of function with &key
+  - it can take a three number argument of (argument default supplied-p)
+  - supplied-p indicates if the passed in parameter was nil or if no parameter was passed in
+** Format string
+  + format used to print - (format stream formatstring varargs)
+  + t is shortand for *standard-output*
+  + Various directives available for use within format string
+   - ~a : aesthetic directive, consumes one argument and outputs it in human readable form.
+   - ~t : tabulation, eg ~10t emits enough spaces to move to the tenth column before processing the next ~a, does not conumse nay arguments
+   - ~{ : next argument consumed must be a list, format loops over list processing directives between ~{ and ~}
+** User Interaction
+  + *query-io* is the stream argument to format for io
+  + force-output function: necessary in some lisp implementations to ensure that Lisp doesn't wait for a newline before printing prompt
+  + read-line function: returns string read (without trailing newline)
+   - Usage: (read-line *query-io*)
+  + y-or-n-p function reprompts user if they enter something that does not start with y,Y,n, or N
+** Evolution of simple database program
+*** Workflow
+   1  Write function to read title,artist,rating,ripped and write in plist
+   1. Create a global list to store the list of data(plists) received
+   2. Function to write the data to output stream
+   3. Create a wrapper to user input the data
+   4. Wrapper should format rating as number and ripped as y/n
+   5. Way for user to select from list
+   6. Pass in filter functions containing a lambda to the select function
+   7. 4 functions , one for each field
+   8. Replace 4 with one function taking keyword arguments
+
+

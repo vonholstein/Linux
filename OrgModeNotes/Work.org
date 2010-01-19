@@ -1,0 +1,21 @@
+* Work
+** TODO Deploying Servers in QA Lab
+   - State "TODO"       from ""           [2010-01-18 Mon 13:10]
+*** DONE Physical Server Deployment
+    CLOSED: [2010-01-18 Mon 13:12]
+
+*** TODO Server Hardware Configuration
+**** TODO Talk to lab team and patch ports in qa lab
+     - State "TODO"       [2010-01-18 Mon 23:00]
+     - State "WAITING"    from "NEXT"       [2010-01-18 Mon 13:30] \\
+       Waiting for lab response to request for port configuration and lan cables
+     - State "NEXT"       from "NEXT"       [2010-01-18 Mon 13:16]
+**** DONE Connect machines to power
+     CLOSED: [2010-01-18 Mon 23:01]
+**** NEXT Get switch and lan cables and connect those to servers
+     - State "NEXT"       [2010-01-18 Mon 23:01] \\
+       Connect rest of lan cables to servers
+**** DONE Connect machines to KVM
+     CLOSED: [2010-01-18 Mon 23:01]
+     - State "NEXT"       from "TODO"       [2010-01-18 Mon 13:31]
+**** TODO Verify that machines boot up

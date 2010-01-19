@@ -1,0 +1,15 @@
+* Hunchentoot
+** Start hunchentoot
+   (hunchentoot:start (make-instance 'hunchentoot:acceptor :port 4242))
+** How to define a handler
+   (hunchentoot:define-easy-handler (say-yo :uri "/yo") (name)
+   (setf (hunchentoot:content-type*) "text/plain")
+   (format nil "Hey~@[ ~A~]!" name))
+** asdf
+   (require 'asdf-install)
+*** Install a package using asdf
+    (asdf-install:install :hunchentoot)
+** Install the test server
+   (asdf:oos 'asdf:load-op :hunchentoot-test)
+   Goto http://localhost:4242/hunchentoot/test to test
+   
