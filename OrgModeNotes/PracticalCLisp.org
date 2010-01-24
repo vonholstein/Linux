@@ -19,21 +19,24 @@
   - Input: (with-open-file (in filename))
    * reading a file for input does not require direction arg as input is default)
   - SETF macro is CLisp's main assignment operator
-   * sets its first argument to the result of evaluating its seconds argument
+   * sets its first argument to the result of evaluating its second argument
  + with-standard-io-syntax ensures that certain variables that affect the behavior of PRINT are set to their standard values
  + PRINT prints Lisp objects in form that can be read back in by the Lisp reader
  + REMOVE-IF-NOT takes a predicate and a list and returns a list containing only the elements of the original list that match the predicate
   - Usage: (remove-if-not predicate-function list)
+ + remove-if is the complement of remove-if-not
  + keyword parameters - one way to achieve varying number of arguments
   - prefix argument list of function with &key
   - it can take a three number argument of (argument default supplied-p)
   - supplied-p indicates if the passed in parameter was nil or if no parameter was passed in
+ + reverse takes a list as an argument and returns a new reversed list
+ + A back quote before an expression stops evaluation like a forward quote, but any sub expression within that back quoted expression that is preceded by a comma is evaluated
 ** Format string
   + format used to print - (format stream formatstring varargs)
-  + t is shortand for *standard-output*
+  + t is shorthand for *standard-output*
   + Various directives available for use within format string
    - ~a : aesthetic directive, consumes one argument and outputs it in human readable form.
-   - ~t : tabulation, eg ~10t emits enough spaces to move to the tenth column before processing the next ~a, does not conumse nay arguments
+   - ~t : tabulation, eg ~10t emits enough spaces to move to the tenth column before processing the next ~a, does not consume nay arguments
    - ~{ : next argument consumed must be a list, format loops over list processing directives between ~{ and ~}
 ** User Interaction
   + *query-io* is the stream argument to format for io
@@ -53,4 +56,60 @@
    7. 4 functions , one for each field
    8. Replace 4 with one function taking keyword arguments
 
-
+* Chapter 4 - Syntax and Semantics
+** Blackbox analogy - Reader and Evaluator
+*** Reader tranlates lisp code into s-expressions
+*** Evaluator defines a syntax of Lisp forms that can be built out of s-expressions
+** s-expressions
+*** Basic elements of s-expressions are atoms and lists
+*** Comments start with semicolon
+*** rationals - integers and ratios
+    All rationals are represented internally in simplified form 2/8 and 1/4 are equal
+*** Names used in Lisp programs, such as FORMAT and hello-world, and *db* are represented by objects called symbols
+*** To ensure that the same textual name is always read as the same symbol, the reader interns symbols--after it has read the name and converted it to all uppercase, the reader looks in a table called a package for an existing symbol with the same name. If it can't find one, it creates a new symbol and adds it to the table. Otherwise, it returns the symbol already in the table.
+*** By convention global variables are given names that start and end with *, likewise constants are given names that start and end with +
+** s-expressions as lisp forms
+*** Each legal lisp form is evaluated according to its own rule
+*** Any atom - a non-list or the empty list - is a legal list form as is any list that has a symbol as it's first element
+*** The simplest lisp forms - atoms - can be divided into symbols and everything else
+**** A symbol, evaluated as a form, is considered the name of a variable and evaluates to its current value
+**** All other atoms are self evaluating objects
+**** Another class of self-evaluating symbols are keyword symbols, a keyword symbol evaluates to a constant variable with the name and with the symbol as value
+*** Three kinds of list forms
+     + Function call forms
+     + Macro forms
+     + Special forms
+** Function call forms
+*** Evaluate remaining elements of the list as lisp forms and pass the resulting values to the named function
+** Special Operators
+*** Because all arguments in a function call form are evaluated before running the function it is not suitable in cases such as an if condition
+*** For such special situations, 25 special operators exist
+*** When the first element in a list is a special operator, the rest of the elements in that list are evaluated according to the rule for that operator
+*** Some special operators are used often enough that a special syntax exists for it in the reader, Ex
+**** (quote (+ 1 2)) can be expressed as '(+ 1 2)
+** Macros
+*** Macros can be used to expand language syntax
+*** Evaluation of macro form is in two phases
+**** First phase, macro form is passed unevaluated to the macro function
+**** Second phase, the form returned by the macro function - called its expansion - is evaluated according to normal evaluation rules
+*** Since the macro form is unevaluated at compilation, it need not be a well-formed lisp form
+** Truth, Falsehood and Equality
+*** Symbol NIL is the only false value - everything else is true
+*** Symbol T is the canonical true value
+*** NIL is the only object that is both an atom and a list
+*** NIL is the name of a constant variable with the symbol NIL as its value
+*** nil, 'nil and '() all evaluate to the same value
+*** Equality Predicates - EQ,EQL,EQUAL,EQUALP
+**** EQ tests for object identity, two objects are EQ if they are identical
+     Whether numbers and characters  return true on EQ depends on implementation, standard does not specify whether (EQ 3 3) should return true or not
+     Never use EQ to test equality for numbers or characters
+**** EQL behaves like EQ but guarantees equality for two objects of the same class with the same value
+     Guarantees (EQL 1 1) returns true but (EQL 1 1.0) returns false since they are instances of different object classes
+**** EQUAL behaves like EQL but considers two lists to be equivalent if they have same structure and contents
+     Also considers strings equivalent if they have contain the same characters
+**** EQUALP behaves like EQUAL except even less discriminating
+     Considers two strings equivalent if they have same characters regardless of case
+     Considers two characters equivalent if same character regardless of case
+     Considers two numbers equivalent if they have same value regardless of class
+     Lists with EQUALP elements are EQUALP, arrays with EQUALP elements are EQUALP
+** Formatting Lisp Code

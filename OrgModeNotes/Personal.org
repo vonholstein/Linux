@@ -1,0 +1,5 @@
+* Lisp
+** Practical Common Lisp
+*** DONE Read Chapter 3
+    CLOSED: [2010-01-25 Mon 00:23]
+*** TODO Read Chapter 4
