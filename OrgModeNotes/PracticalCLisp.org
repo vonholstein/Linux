@@ -113,3 +113,170 @@
      Considers two numbers equivalent if they have same value regardless of class
      Lists with EQUALP elements are EQUALP, arrays with EQUALP elements are EQUALP
 ** Formatting Lisp Code
+* Chapter 5 - Functions
+** RETURN-FROM operator can be used to return from anywhere in a function
+** required parameters - simple list of variable names
+** Optional parameters
+*** Place the symbol &optional followed by the names of the optional parameters
+*** NIL is given for parameters for which no argument is passed
+*** If a value other than NIL should be given as the default value for parameters write the definition like this
+    (defun func-name (a b &optional (c 10) d))
+*** The default value expression can refer to parameters that occur earlier in the parameter list
+*** If it is to be known whether an actual value was passed another variable can be added to the parameter specifier after the default value
+    (defun func-name (a b &optional (c 10 c-supplied-p) d))
+** Rest parameters
+*** Catchall parameter used to gather any number of arguments
+*** Catches all arguments left after required and optional parameters have been consumed into a list and assigns to rest parameter
+*** specified using &rest
+    (defun func-name (a &optional b &rest c))
+** Keyword parameters
+*** Optional parameters are positional, caller has to pass in all optional args upto the optional arg position in which he is interested
+*** To specify; after required,optional and rest parameters include &key followed by keyword parameters
+    (defun key-param-test (a &optional b &rest c &key d e))
+*** Provides a default-value form and supplied-p variable
+*** Default value form can refer to variables earlier in param list
+*** Keyword Parameter names within function definition can be specified to be different from argument names the caller should use
+    (defun rfunc-name (&key (:apple a) (:box b) (:cart c)))
+** Mixing different parameter types
+*** If mixing optional and key parameters if all optional params do not have corresponding args they will consume args meant for keyword params
+    In such a case better solution is to convert all params to keyword type
+*** If both &rest and &key appear in a function definition all remaining args after required and optional are gathered up and assigned to rest parameter,
+    as well as appropriate values being bound to keyword params
+** Function Return values
+*** RETURN-FROM actually returns from a block of code defined with the BLOCK operator, however defun automatically wraps a block around the function code with the function name
+    Usage: (return-from function-name return-value)
+** Functions as Data
+*** Special operator FUNCTION takes a single argument and returns the function object with that name
+*** The syntax #' is syntactic sugar for FUNCTION
+*** Function objects can be invoked using FUNCALL and APPLY
+*** (FUNCALL function-object arguments)
+*** Use FUNCALL when the number of arguments that is passed to the function is known at compile time
+*** Use APPLY when the number of arguments is not known at compile time
+*** (APPLY function-object (list-of-arguments))
+*** Apply also takes loose arguments
+    (APPLY function-object arg1 (list-of-args))
+*** (APPLY #'upcase element1 rest-of-elements-list)
+*** The argument list produced by combining loose arguments with the final list must be a legal argument list for the function
+** Anonymous Functions
+*** Created using a lambda expression
+*** (lambda (parameters) body)
+*** lambda expressions can be used wherever a normal function name can be
+* Chapter 6 - Variables
+** Two kinds of variables - Lexical and Dynamic
+** Variable Basics
+*** Dynamically typed
+*** Strongly typed - type erros will be detected
+*** Binding - runtime manifestation of a variable
+*** LET - create a new binding form
+    (let (variable*) (body-form*))
+*** Scope is delimited by the form that introduced the variable - known as the binding form
+*** Nesting binding forms causes variables in inner bindings to shadow outer bindings
+*** LET* - In a LET intial value forms for variables defined in let cannot refer to earlier variables, in LET* this can be done
+    (let ((a 10) (b a+10))) not possible, (let* ((a 10) (b a + 10))) legal
+** Lexical variables and closures
+*** By default all binding forms introduce lexically scoped variables
+*** Within a binding form, if a variable is returned as part of an anonymous function then the binding for that variable persists for as long as a reference to the anonymous function exists
+*** In this case, the anonymous function is called a closure since it closes over the enclosing binding
+** Dynamic variables
+*** Two ways to create global variables - DEFVAR and DEFPARAMETER
+    (defvar *count* 0)
+    (defparameter *gap* 0.01)
+*** defparameter always assignes initial value to variable while defvar does so only if variable is undefined
+*** When binding a dynamic variable, the binding that is created on entry to the binding form replaces the global binding during the duration of the binding form
+** Constants
+*** Constants are defined with DEFCONSTANT
+*** Has global effect on name used like DEFVAR and DEFPARAMETER, name cannot be rebound in other binding form
+*** By convention constant names start and end with +
+** Assignment
+*** SETF macro used to assign new value to a binding
+    (setf place value)
+*** SETF can also assign to multiple places in sequence
+    (setf x 1 y 2)
+*** SETF returns the newly assigned value
+** Generalized Assignment
+*** SETF can assign any place a value
+    Array (setf (aref a 0) 10)
+    Hashtable (setf (gethash 'key hash) 10)
+    Slot named field (setf (field 0) 10)
+** Other ways to modify places
+*** INCF, DECF examples of macros called modify macros
+**** Modify macros are built on top of setf, more concise
+     (incf (aref *array* (random (length *array*))))
+*** ROTATEF rotates values between places
+    (rotatef a b c) -> a = b, b = c, c = a
+*** SHIFTF shifts values to the left
+    (shiftf a b 10)
+* Chapter 7 - Standard Control Constructs
+  Allows building of new syntax control constructs such as WHEN, DOLIST, LOOP, etc
+** WHEN and UNLESS
+*** WHEN used to abstract the form
+    (if (condition) (progn group-of-statements))
+*** UNLESS used to abstract
+    (if (not condition) (progn group-of-statements))
+*** AND,OR,NOT short circuit macros
+*** (dolist (var list-form) body-form*)
+*** (dotimes (var count-form) body-form*)
+*** (loop for x from 1 to 10 summing x)
+* Chapter 8 - Macros: Defining your own
+** (defmacro name (parameter*)
+     "Optional Documentation String"
+     body-form*)
+**
+* Chapter 12 - List Processing
+** Lists are made up of pairs of values called cons cells
+*** cons takes two args and returns a new cons cell containing the two values
+*** two values in cons cell are called car and cdr
+*** car and cdr are setfable
+*** FIRST and REST are synonyms for CAR and CDR that should be used when dealing with cons cells as lists
+*** (APPEND (list 1 2) (list 3 4)) -> (1 2 3 4)
+** Functional programming implies that result of a function is determined only by the values of its arguments
+*** Lists can be considered as a functional data type if their value is considered to be determined by the elements they contain
+*** Any function that takes a list as an argument and returns a value based solely on the contents of the list can likewise be considered functional
+*** APPEND takes any number of list args and returns a new list containing the elements of all its arguments
+**** (append (list 1 2) (list 3 4)) -> (1 2 3 4)
+** Destructive operations
+*** Operations that modify existing objects are called destructive
+*** Two kinds of destructive operations
+**** for-side-effect operations
+     Problems arise when functions that return structure-sharing results are mixed with non-functional for-side-effect operations
+**** recycyling operations
+     recycling operations are intended to be used in functional code, functions use its values to build result
+***** NREVERSE(n stands for non-consing) reverses list in place
+*** Use recycling functions in the same way their non-destructive counterparts are used excep it's safe to use them only when the args aren't going to be used after the function returns
+*** NCONC returns a concatenation of its list arguments, but it builds its result by setting the cdr of the list's last cons cell to the first cons cell of the next nonempty list
+*** NSUBSTITUTE and variants walk down the list structure and SETFs the CARs of any cons cells holding the old value to the new value and otherwise leave the list intact, it then returns the original list
+** Combining recycling with shared structure
+*** Common idiom to build up a list by consing a value to the front of the list using PUSH and then returning the result of NREVERSEing it
+*** Another idiom to immediately reassign the value returned by the recycling function back to the place containing the potentially recycled value
+*** DELETE, the recycling version of remove
+*** SORT, STABLE-SORT, and MERGE are also recycling functions when applied to lists
+    If you need to preserve the list passed into these functions then pass a copy of the list using COPY-LIST
+** List-Manipulation Functions
+*** SECOND to TENTH functions for returning elements of list ordinally
+*** NTH function can also be used, takes an argument and a list and returns the element at arg index (0 based)
+*** NTHCDR takes an index and a list and returns the resut of calling CDR n timesp
+*** There is no way to get to the nth element of a list without following n CDR references
+*** 28 composite CAR/CDR functions may also be used, each function named by placing a sequence of upto four As and Ds between a C and an R, with each A representing a call to CAR and each D to CDR
+    (caar list) -> (car (car list))
+    (cadr list) -> (car (cdr list))
+    (cadadr list) -> (car (cdr (car (cdr list))))
+*** Other list functions
+    + LAST
+    + BUTLAST
+    + NBUTLAST
+    + LDIFF
+    + TAILP
+    + LIST*
+    + MAKE-LIST
+    + REVAPPEND
+    + NRECONC
+    + CONSP
+    + ATOM
+    + LISTP
+    + NULL
+** Mapping
+*** MAP - can be used with any kind of sequence
+*** MAPCAR takes a function and applies it to elements of lists given as arguments
+*** MAPLIST is like mapcar except instead of passing the elements of the list, it passes the actual cons cells
+*** MAPCAN and MAPCON work like MAPCAR and MAPLIST except instead of building a completely new list to hold the results, MAPCAN and MAPCON build their result by splicing together the results
+*** MAPC and MAPL are control constructs that return their first list argument, only useful when the side effects of the mapped function are worthwhile
